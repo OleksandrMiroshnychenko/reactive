@@ -24,12 +24,12 @@ dependencies {
     implementation 'org.springframework:spring-webflux:5.3.4'
     implementation 'io.projectreactor.netty:reactor-netty:1.0.4'
     //jackson dependencies
+    implementation 'com.fasterxml.jackson.module:jackson-module-kotlin:2.16.2'
     implementation 'com.fasterxml.jackson.core:jackson-databind:2.16.1'
     implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jdk8:2.11.1'
     implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.11.1'
     implementation 'com.fasterxml.jackson.core:jackson-annotations:2.11.1'
     implementation 'com.fasterxml.jackson.core:jackson-core:2.11.1'
-
 
     //log - logback
     implementation("ch.qos.logback:logback-classic:1.4.14")
@@ -38,6 +38,7 @@ dependencies {
     //reactor-debug-agent
     implementation('io.projectreactor:reactor-tools:3.4.0')
 
+    runtimeOnly 'io.netty:netty-resolver-dns-native-macos:4.1.107.Final'
 
     //testing
     testImplementation('org.junit.jupiter:junit-jupiter:5.5.1')
@@ -46,7 +47,7 @@ dependencies {
 
     //wiremock
     testImplementation "com.github.tomakehurst:wiremock-jre8-standalone:3.0.1"
-    implementation "com.github.JensPiegsa:wiremock-extension:0.4.0"
+    testImplementation "com.github.JensPiegsa:wiremock-extension:0.4.0"
 
     testImplementation 'io.mockk:mockk:1.13.10'
 

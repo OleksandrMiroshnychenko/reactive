@@ -1,7 +1,6 @@
 package com.miroshnychenko.service
 
 import com.miroshnychenko.domain.Movie
-import com.miroshnychenko.domain.Revenue
 import com.miroshnychenko.exception.MovieException
 import com.miroshnychenko.exception.NetworkException
 import com.miroshnychenko.exception.ServiceException
@@ -23,6 +22,16 @@ class MovieReactiveService(private val movieInfoService: MovieInfoService, priva
         revenueService: RevenueService
     ) : this(movieInfoService, reviewService) {
         this.revenueService = revenueService
+    }
+
+    fun getAllMoviesRestClient(): Flux<Movie> = movieInfoService.retrieveAllMovieInfoRestClient().flatMap { mi ->
+        reviewService.retrieveReviewsFluxRestClient(mi.movieInfoId).collectList().map { Movie(mi, it) }
+    }.onErrorMap { MovieException(it.message) }.log()
+
+    fun getMovieByIdRestClient(id: Long): Mono<Movie> {
+        val movieInfoMono = movieInfoService.retrieveMovieInfoByIdRestClient(id)
+        val reviewsFlux = reviewService.retrieveReviewsFluxRestClient(id).collectList()
+        return movieInfoMono.zipWith(reviewsFlux) { movieInfo, reviews -> Movie(movieInfo, reviews) }
     }
 
     fun getAllMovies(): Flux<Movie> = movieInfoService.retrieveMoviesFlux().flatMap { mi ->
