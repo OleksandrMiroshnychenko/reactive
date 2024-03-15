@@ -276,4 +276,32 @@ class FluxAndMonoGeneratorServiceTest {
             .expectNext("A", "L", "E", "X", "C", "H", "L", "O", "E")
             .verifyComplete()
     }
+
+    @Test
+    fun exploreGenerate() {
+        val flux = fluxAndMonoGeneratorService.exploreGenerate()
+
+        StepVerifier.create(flux).expectNextCount(10).verifyComplete()
+    }
+
+    @Test
+    fun exploreCreate() {
+        val flux = fluxAndMonoGeneratorService.exploreCreate()
+
+        StepVerifier.create(flux).expectNextCount(9).verifyComplete()
+    }
+
+    @Test
+    fun exploreCreateMono() {
+        val mono = fluxAndMonoGeneratorService.exploreCreateMono()
+
+        StepVerifier.create(mono).expectNext("alex").verifyComplete()
+    }
+
+    @Test
+    fun exploreHandle() {
+        val flux = fluxAndMonoGeneratorService.exploreHandle()
+
+        StepVerifier.create(flux).expectNext("ALEX", "CHLOE").verifyComplete()
+    }
 }

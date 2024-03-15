@@ -1,9 +1,12 @@
 package com.miroshnychenko.service
 
 import com.miroshnychenko.exception.ReactorException
+import com.miroshnychenko.util.CommonUtil.delay
 import reactor.core.publisher.Flux
+import reactor.core.publisher.FluxSink
 import reactor.core.publisher.Mono
 import java.time.Duration
+import java.util.concurrent.CompletableFuture
 import kotlin.random.Random
 
 class FluxAndMonoGeneratorService {
@@ -195,6 +198,44 @@ class FluxAndMonoGeneratorService {
                 println(ex.message)
                 println(s)
             }
+
+    fun exploreGenerate(): Flux<Int> = Flux.generate({ 1 }, { state, sink ->
+        sink.next(state * 2)
+        if (state == 10) {
+            sink.complete()
+        }
+        state + 1
+    }).log()
+
+    private fun names(): List<String> {
+        delay(1000)
+        return listOf("alex", "ben", "chloe")
+    }
+
+    fun exploreCreate(): Flux<String> = Flux.create { sink ->
+        CompletableFuture.supplyAsync(this::names)
+            .thenAccept {
+                it.forEach { name ->
+                    sink.next(name)
+                    sink.next(name)
+                }
+            }
+            .thenRun { sendEvents(sink) }
+    }.log()
+
+    private fun sendEvents(sink: FluxSink<String>) =
+        CompletableFuture.supplyAsync(this::names)
+            .thenAccept { it.forEach(sink::next) }
+            .thenRun(sink::complete)
+
+    fun exploreCreateMono(): Mono<String> = Mono.create { it.success("alex") }
+
+    fun exploreHandle(): Flux<String> = Flux.fromIterable(listOf("alex", "ben", "chloe"))
+        .handle { name, sink ->
+            if (name.length > 3) {
+                sink.next(name.uppercase())
+            }
+        }.log()
 }
 
 fun main() {
